@@ -1,2 +1,2 @@
-# counting-up-game
-2023 S2 SWEN30006 Project 2
+# Project 2 Current Version
+The current version for project 2
