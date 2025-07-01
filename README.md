@@ -1,5 +1,8 @@
 # Counting Up Game
-A Java-based counting up game application.
+A Java-based counting up game application built using JGameGrid framework.
+
+<img width="556" alt="image" src="https://github.com/user-attachments/assets/d2e963f9-a729-45a5-b6c1-4cbc09277811" />
+
 
 ## Game Instructions
 
