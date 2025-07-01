@@ -5,11 +5,15 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public abstract class ComputerPlayer extends Player {
-    int SEED = 30008;
-    Random random = new Random(SEED);
+    private static int instanceCounter = 0;
+    Random random;
 
     public ComputerPlayer(Deck deck) {
         super(deck);
+        // Use current time plus instance counter to ensure unique seeds for each
+        // computer player
+        int seed = (int) (System.currentTimeMillis() + (instanceCounter++ * 1000));
+        this.random = new Random(seed);
     }
 
     // return a random card from the list
@@ -20,6 +24,7 @@ public abstract class ComputerPlayer extends Player {
 
     /**
      * Get all valid card based on the
+     * 
      * @param lastCard
      * @param isFirstCard
      * @return

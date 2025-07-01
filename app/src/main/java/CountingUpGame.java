@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("serial")
 public class CountingUpGame extends CardGame {
-    private static final int SEED = 30008; // 30008, 30009, 30007, 30006
-    private static final Random RANDOM = new Random(SEED);
+    private int seed;
+    private Random random;
     private Properties properties;
     private StringBuilder logResult = new StringBuilder();
     private List<List<String>> playerAutoMovements = new ArrayList<>();
@@ -34,7 +34,7 @@ public class CountingUpGame extends CardGame {
             // new Location(650, 575)
             new Location(575, 575)
     };
-    private Actor[] scoreActors = {null, null, null, null};
+    private Actor[] scoreActors = { null, null, null, null };
     private final static Location TRICK_LOCATIONS = new Location(350, 350);
     private final static Location TEXT_LOCATION = new Location(350, 450);
     private int thinkingTime = 2000;
@@ -43,14 +43,13 @@ public class CountingUpGame extends CardGame {
     private Location hideLocation = new Location(-500, -500);
 
     private int[] scores = new int[NUM_PLAYERS];
-    private int[] autoIndexplayers = new int [NUM_PLAYERS];
+    private int[] autoIndexplayers = new int[NUM_PLAYERS];
     private boolean isAuto = false;
     private Card selected;
 
     Font bigFont = new Font("Arial", Font.BOLD, 36);
 
     private ArrayList<CardsPlayedListener> cardsPlayedListeners = new ArrayList<>();
-
 
     public void setStatus(String string) {
         setStatusText(string);
@@ -67,7 +66,7 @@ public class CountingUpGame extends CardGame {
 
     private void calculateScoreEndOfRound(int player, List<Card> cardsPlayed) {
         int totalScorePlayed = 0;
-        for (Card card: cardsPlayed) {
+        for (Card card : cardsPlayed) {
             Rank rank = (Rank) card.getRank();
             totalScorePlayed += rank.getScoreCardValue();
         }
@@ -76,7 +75,7 @@ public class CountingUpGame extends CardGame {
 
     private void calculateNegativeScoreEndOfGame(int player, List<Card> cardsInHand) {
         int totalScorePlayed = 0;
-        for (Card card: cardsInHand) {
+        for (Card card : cardsInHand) {
             Rank rank = (Rank) card.getRank();
             totalScorePlayed -= rank.getScoreCardValue();
         }
@@ -123,8 +122,8 @@ public class CountingUpGame extends CardGame {
     }
 
     // return random Card from ArrayList
-    public static Card randomCard(ArrayList<Card> list) {
-        int x = RANDOM.nextInt(list.size());
+    public Card randomCard(ArrayList<Card> list) {
+        int x = random.nextInt(list.size());
         return list.get(x);
     }
 
@@ -152,7 +151,7 @@ public class CountingUpGame extends CardGame {
     private Card getCardFromList(List<Card> cards, String cardName) {
         Rank cardRank = getRankFromString(cardName);
         Suit cardSuit = getSuitFromString(cardName);
-        for (Card card: cards) {
+        for (Card card : cards) {
             if (card.getSuit() == cardSuit
                     && card.getRank() == cardRank) {
                 return card;
@@ -163,7 +162,7 @@ public class CountingUpGame extends CardGame {
 
     private void dealingOut(Hand[] players, int NUM_PLAYERS, int nbCardsPerPlayer) {
         Hand pack = DECK.toHand(false);
-        //int[] cardsDealtPerPlayer = new int[NUM_PLAYERS];
+        // int[] cardsDealtPerPlayer = new int[NUM_PLAYERS];
 
         for (int i = 0; i < NUM_PLAYERS; i++) {
             String initialCardsKey = "players." + i + ".initialcards";
@@ -172,7 +171,7 @@ public class CountingUpGame extends CardGame {
                 continue;
             }
             String[] initialCards = initialCardsValue.split(",");
-            for (String initialCard: initialCards) {
+            for (String initialCard : initialCards) {
                 if (initialCard.length() <= 1) {
                     continue;
                 }
@@ -187,7 +186,8 @@ public class CountingUpGame extends CardGame {
         for (int i = 0; i < NUM_PLAYERS; i++) {
             int cardsToDealt = nbCardsPerPlayer - players[i].getNumberOfCards();
             for (int j = 0; j < cardsToDealt; j++) {
-                if (pack.isEmpty()) return;
+                if (pack.isEmpty())
+                    return;
                 Card dealt = randomCard(pack.getCardList());
                 dealt.removeFromHand(false);
                 players[i].insert(dealt, false);
@@ -202,7 +202,7 @@ public class CountingUpGame extends CardGame {
             if (cards.isEmpty()) {
                 continue;
             }
-            for (Card card: cards) {
+            for (Card card : cards) {
                 if (card.getSuit() == Suit.CLUBS) {
                     return i;
                 }
@@ -239,7 +239,8 @@ public class CountingUpGame extends CardGame {
             logResult.append(scores[i] + ",");
         }
         logResult.append("\n");
-        logResult.append("Winners:" + String.join(", ", winners.stream().map(String::valueOf).collect(Collectors.toList())));
+        logResult.append(
+                "Winners:" + String.join(", ", winners.stream().map(String::valueOf).collect(Collectors.toList())));
     }
 
     private void playGame() {
@@ -247,11 +248,12 @@ public class CountingUpGame extends CardGame {
         Hand playingArea = null;
         int winner = 0;
         int roundNumber = 1;
-        for (int i = 0; i < NUM_PLAYERS; i++) updateScore(i);
+        for (int i = 0; i < NUM_PLAYERS; i++)
+            updateScore(i);
         boolean isContinue = true;
         int skipCount = 0;
         Card lastCard = null;
-        //List<Card>cardsPlayed = new ArrayList<>();
+        // List<Card>cardsPlayed = new ArrayList<>();
         playingArea = new Hand(DECK);
         addRoundInfoToLog(roundNumber);
 
@@ -259,7 +261,7 @@ public class CountingUpGame extends CardGame {
         int nextPlayer = playerIndexWithAceClub();
         boolean isFirstCard = true;
         // While the game has not ended, loop over each player's turn
-        while(isContinue) {
+        while (isContinue) {
             selected = null;
             boolean finishedAuto = false;
 
@@ -293,11 +295,11 @@ public class CountingUpGame extends CardGame {
 
             // If the game is not in auto mode, or if the auto testing ends,
             // continue using implemented logic
-            if (!isAuto || finishedAuto){
+            if (!isAuto || finishedAuto) {
                 if (players[nextPlayer] instanceof PlayerHuman) {
-                    ((PlayerHuman)players[nextPlayer]).startSelection();
+                    ((PlayerHuman) players[nextPlayer]).startSelection();
                     setStatus("Player 0 double-click on card to follow or press Enter to pass");
-                    while (null == selected && ((PlayerHuman)players[nextPlayer]).isWaitingForPass()) {
+                    while (null == selected && ((PlayerHuman) players[nextPlayer]).isWaitingForPass()) {
                         delay(delayTime);
                         selected = players[nextPlayer].selectCard(lastCard, isFirstCard);
                     }
@@ -320,14 +322,15 @@ public class CountingUpGame extends CardGame {
 
             // Follow with selected card
 
-            playingArea.setView(this, new RowLayout(TRICK_LOCATIONS, (playingArea.getNumberOfCards() + 2) * TRICK_WIDTH));
+            playingArea.setView(this,
+                    new RowLayout(TRICK_LOCATIONS, (playingArea.getNumberOfCards() + 2) * TRICK_WIDTH));
             playingArea.draw();
             addCardPlayedToLog(nextPlayer, selected);
             if (selected != null) {
                 lastCard = selected;
                 skipCount = 0;
-                //cardsPlayed.add(selected);
-                selected.setVerso(false);  // In case it is upside down
+                // cardsPlayed.add(selected);
+                selected.setVerso(false); // In case it is upside down
                 selected.transfer(playingArea, true); // transfer to trick (includes graphic effect)
                 delay(delayTime);
                 // End Follow
@@ -374,7 +377,7 @@ public class CountingUpGame extends CardGame {
         String player2AutoMovement = properties.getProperty("players.2.cardsPlayed");
         String player3AutoMovement = properties.getProperty("players.3.cardsPlayed");
 
-        String[] playerMovements = new String[] {"", "", "", ""};
+        String[] playerMovements = new String[] { "", "", "", "" };
         if (player0AutoMovement != null) {
             playerMovements[0] = player0AutoMovement;
         }
@@ -402,16 +405,21 @@ public class CountingUpGame extends CardGame {
         setTitle("CountingUpGame (V" + VERSION + ") Constructed for UofM SWEN30006 with JGameGrid (www.aplu.ch)");
         setStatusText("Initializing...");
         initScore();
-        //addKeyListener(this);
+        // addKeyListener(this);
         setupPlayerAutoMovements();
         initGame();
         playGame();
 
-        for (int i = 0; i < NUM_PLAYERS; i++) updateScore(i);
+        for (int i = 0; i < NUM_PLAYERS; i++)
+            updateScore(i);
         int maxScore = 0;
-        for (int i = 0; i < NUM_PLAYERS; i++) if (scores[i] > maxScore) maxScore = scores[i];
+        for (int i = 0; i < NUM_PLAYERS; i++)
+            if (scores[i] > maxScore)
+                maxScore = scores[i];
         List<Integer> winners = new ArrayList<Integer>();
-        for (int i = 0; i < NUM_PLAYERS; i++) if (scores[i] == maxScore) winners.add(i);
+        for (int i = 0; i < NUM_PLAYERS; i++)
+            if (scores[i] == maxScore)
+                winners.add(i);
         String winText;
         if (winners.size() == 1) {
             winText = "Game over. Winner is player: " +
@@ -431,6 +439,16 @@ public class CountingUpGame extends CardGame {
     public CountingUpGame(Properties properties) {
         super(700, 700, 30);
         this.properties = properties;
+
+        // Initialize seed from properties or use random seed
+        String seedProperty = properties.getProperty("seed");
+        if (seedProperty != null && !seedProperty.trim().isEmpty()) {
+            this.seed = Integer.parseInt(seedProperty.trim());
+        } else {
+            this.seed = (int) System.currentTimeMillis(); // Use current time for random seed
+        }
+        this.random = new Random(this.seed);
+
         isAuto = Boolean.parseBoolean(properties.getProperty("isAuto"));
         if (isAuto) {
             thinkingTime = 50;

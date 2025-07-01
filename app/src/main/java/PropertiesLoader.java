@@ -8,6 +8,10 @@ import java.util.Properties;
 public class PropertiesLoader {
     public static Properties loadPropertiesFile(String propertiesFile) {
         try (InputStream input = PropertiesLoader.class.getClassLoader().getResourceAsStream(propertiesFile)) {
+            if (input == null) {
+                System.err.println("Unable to find properties file: " + propertiesFile);
+                return null;
+            }
 
             Properties prop = new Properties();
             // load a properties file
